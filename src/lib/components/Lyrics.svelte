@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getLyrics, type LyricLine } from '$lib/api/lyrics';
+	import { onMount, tick } from 'svelte';
 
 	interface Props {
 		trackId: string;
@@ -12,18 +13,30 @@
 	let lines = $state<LyricLine[]>([]);
 	let loading = $state(true);
 	let error = $state(false);
-	let container: HTMLDivElement | undefined = $state();
+	let outer: HTMLDivElement | undefined = $state();
+	let inner: HTMLDivElement | undefined = $state();
 	let lastTrackId = $state('');
+	let halfHeight = $state(0);
+
+	onMount(() => {
+		if (outer) {
+			halfHeight = outer.clientHeight / 2;
+		}
+	});
 
 	$effect(() => {
 		if (trackId !== lastTrackId) {
 			lastTrackId = trackId;
 			loading = true;
 			error = false;
-			getLyrics(trackId).then((data) => {
+			getLyrics(trackId).then(async (data) => {
 				lines = data?.lines ?? [];
 				loading = false;
 				error = false;
+				await tick();
+				if (outer && halfHeight === 0) {
+					halfHeight = outer.clientHeight / 2;
+				}
 			}).catch(() => {
 				lines = [];
 				loading = false;
@@ -43,10 +56,12 @@
 	});
 
 	$effect(() => {
-		if (activeLine >= 0 && container) {
-			const el = container.children[activeLine] as HTMLElement;
+		if (activeLine >= 0 && outer && inner) {
+			const children = inner.children;
+			const el = children[activeLine] as HTMLElement | undefined;
 			if (el) {
-				el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+				const scrollTarget = el.offsetTop - outer.clientHeight / 2 + el.clientHeight / 2;
+				outer.scrollTo({ top: scrollTarget, behavior: 'smooth' });
 			}
 		}
 	});
@@ -58,22 +73,59 @@
 	}
 </script>
 
-<div bind:this={container} class="flex h-full w-full flex-col items-center overflow-y-auto py-8 scrollbar-hide">
+<div
+	bind:this={outer}
+	class="lyrics-fade relative h-full w-full overflow-y-auto scrollbar-hide"
+>
 	{#if loading}
-		<p class="text-sm text-text-muted">Loading lyrics...</p>
+		<div class="flex h-full items-center justify-center">
+			<p class="text-sm text-white/50">Loading lyrics...</p>
+		</div>
 	{:else if lines.length === 0}
-		<p class="text-sm text-text-muted">{error ? 'Failed to load lyrics' : 'No lyrics available'}</p>
+		<div class="flex h-full items-center justify-center">
+			<p class="text-sm text-white/50">{error ? 'Failed to load lyrics' : 'No lyrics available'}</p>
+		</div>
 	{:else}
-		{#each lines as line, i}
-			<!-- svelte-ignore a11y_click_events_have_key_events -->
-			<p
-				role={onseek ? 'button' : undefined}
-				tabindex={onseek ? 0 : undefined}
-				class="px-4 py-1.5 text-center text-lg transition-all duration-300 {i === activeLine ? 'font-bold text-text scale-105' : 'text-text-muted/60'} {onseek ? 'cursor-pointer hover:text-text/80' : ''}"
-				onclick={() => handleLineClick(line)}
-			>
-				{line.text}
-			</p>
-		{/each}
+		<div
+			bind:this={inner}
+			class="flex flex-col items-center"
+			style="padding-top: {halfHeight}px; padding-bottom: {halfHeight}px;"
+		>
+			{#each lines as line, i}
+				<!-- svelte-ignore a11y_click_events_have_key_events -->
+				<p
+					role={onseek ? 'button' : undefined}
+					tabindex={onseek ? 0 : undefined}
+					class="px-4 py-2 text-center text-xl lg:py-3 lg:text-3xl {i === activeLine ? 'font-bold text-white scale-105' : 'text-white/50'} {onseek ? 'cursor-pointer hover:text-white/70' : ''}"
+					style="transition: font-weight 0.5s, transform 0.5s, color 0.5s;"
+					onclick={() => handleLineClick(line)}
+				>
+					{line.text}
+				</p>
+			{/each}
+		</div>
 	{/if}
 </div>
+
+<style>
+	.lyrics-fade {
+		mask-image: linear-gradient(
+			to bottom,
+			transparent 0%,
+			transparent 5%,
+			black 30%,
+			black 70%,
+			transparent 95%,
+			transparent 100%
+		);
+		-webkit-mask-image: linear-gradient(
+			to bottom,
+			transparent 0%,
+			transparent 5%,
+			black 30%,
+			black 70%,
+			transparent 95%,
+			transparent 100%
+		);
+	}
+</style>

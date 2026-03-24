@@ -40,7 +40,7 @@ let shuffle = $state(false);
 let repeat = $state<RepeatMode>('off');
 let showQueue = $state(false);
 let showNowPlaying = $state(false);
-let showLyrics = $state(false);
+let showLyrics = $state(typeof localStorage !== 'undefined' && localStorage.getItem('gelatin-show-lyrics') === 'true');
 
 function handleTrackEnd() {
 	if (repeat === 'one') {
@@ -147,6 +147,7 @@ export const player = {
 	},
 	set showLyrics(v: boolean) {
 		showLyrics = v;
+		localStorage.setItem('gelatin-show-lyrics', String(v));
 	},
 
 	play() {
