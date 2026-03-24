@@ -3,6 +3,8 @@ import tailwindcss from '@tailwindcss/vite';
 import { SvelteKitPWA } from '@vite-pwa/sveltekit';
 import { defineConfig } from 'vite';
 
+const base = process.env.BASE_PATH || '';
+
 export default defineConfig({
 	plugins: [
 		tailwindcss(),
@@ -16,8 +18,8 @@ export default defineConfig({
 				theme_color: '#0f0f0f',
 				background_color: '#0f0f0f',
 				display: 'standalone',
-				scope: '/',
-				start_url: '/',
+				scope: `${base}/`,
+				start_url: `${base}/`,
 				icons: [
 					{
 						src: '/icon-192.png',
