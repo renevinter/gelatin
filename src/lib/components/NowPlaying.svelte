@@ -88,6 +88,43 @@
 			}, 3500);
 		}
 	}
+
+	// Screen Wake Lock: keep screen on in StandBy mode
+	let wakeLock: WakeLockSentinel | null = null;
+
+	async function acquireWakeLock() {
+		if (!('wakeLock' in navigator)) return;
+		try {
+			wakeLock = await navigator.wakeLock.request('screen');
+			wakeLock.addEventListener('release', () => {
+				wakeLock = null;
+			});
+		} catch {
+			// Wake lock request failed (e.g. low battery)
+		}
+	}
+
+	function releaseWakeLock() {
+		wakeLock?.release();
+		wakeLock = null;
+	}
+
+	$effect(() => {
+		const shouldLock = player.showNowPlaying && isStandby;
+		if (shouldLock) {
+			acquireWakeLock();
+			const onVisibilityChange = () => {
+				if (document.visibilityState === 'visible') acquireWakeLock();
+			};
+			document.addEventListener('visibilitychange', onVisibilityChange);
+			return () => {
+				document.removeEventListener('visibilitychange', onVisibilityChange);
+				releaseWakeLock();
+			};
+		} else {
+			releaseWakeLock();
+		}
+	});
 </script>
 
 {#if player.currentTrack}
@@ -156,15 +193,10 @@
 						</div>
 					</div>
 
-					<div class="mt-3 w-full max-w-[17rem] text-center">
-						<p class="truncate text-base font-semibold text-white">{track.name}</p>
-						<p class="truncate text-sm text-white/40">{track.artistName}</p>
-					</div>
-
-					<!-- Thin progress bar -->
+					<!-- Progress bar -->
 					<div class="mt-3 w-full max-w-[17rem]">
 						<button
-							class="relative block h-[3px] w-full cursor-pointer rounded-full bg-white/10"
+							class="relative block h-2 w-full cursor-pointer rounded-full bg-white/10"
 							onclick={handleSeek}
 							aria-label="Seek"
 						>
@@ -173,6 +205,11 @@
 								style="width: {player.duration ? (player.currentTime / player.duration) * 100 : 0}%"
 							></div>
 						</button>
+					</div>
+
+					<div class="mt-2 w-full max-w-[17rem] text-center">
+						<p class="truncate text-base font-semibold text-white">{track.name}</p>
+						<p class="truncate text-sm text-white/40">{track.artistName}</p>
 					</div>
 				</div>
 
