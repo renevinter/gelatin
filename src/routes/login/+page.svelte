@@ -36,8 +36,8 @@
 					<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 14H7v-2h10v2zm0-4H7v-2h10v2zm0-4H7V7h10v2z" />
 				</svg>
 			</div>
-			<h1 class="text-2xl font-bold text-text">Gelatin</h1>
-			<p class="mt-1 text-sm text-text-muted">Connect to your Jellyfin server</p>
+			<h1 class="text-2xl font-bold text-text">Connect to server</h1>
+			<p class="mt-1 text-sm text-text-muted">Which server should we play music from?</p>
 		</div>
 
 		<form onsubmit={handleSubmit} class="space-y-4">

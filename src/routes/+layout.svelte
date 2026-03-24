@@ -15,15 +15,17 @@
 
 	let { children } = $props();
 
-	const isLoginPage = $derived($page.url.pathname === `${base}/login`);
+	const isPublicPage = $derived(
+		$page.url.pathname === `${base}/login` || $page.url.pathname === `${base}/welcome`
+	);
 
 	onMount(() => {
 		theme.init();
 	});
 
 	$effect(() => {
-		if (!auth.isLoggedIn && !isLoginPage) {
-			goto(`${base}/login`);
+		if (!auth.isLoggedIn && !isPublicPage) {
+			goto(`${base}/welcome`);
 		}
 	});
 
@@ -58,7 +60,7 @@
 
 <svelte:window onkeydown={handleKeydown} />
 
-{#if isLoginPage}
+{#if isPublicPage}
 	{@render children()}
 {:else if auth.isLoggedIn}
 	<Nav />
