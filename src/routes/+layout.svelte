@@ -12,12 +12,29 @@
 	import NowPlaying from '$lib/components/NowPlaying.svelte';
 	import Queue from '$lib/components/Queue.svelte';
 	import Toasts from '$lib/components/Toasts.svelte';
+	import TitleBarSearch from '$lib/components/TitleBarSearch.svelte';
 
 	let { children } = $props();
 
 	const isPublicPage = $derived(
 		$page.url.pathname === `${base}/login` || $page.url.pathname === `${base}/welcome`
 	);
+
+	const pageTitles: Record<string, string> = {
+		'/': 'Home',
+		'/search': 'Search',
+		'/artists': 'Artists',
+		'/albums': 'Albums',
+		'/songs': 'Songs',
+		'/playlists': 'Playlists',
+		'/favorites': 'Favorites',
+		'/settings': 'Settings'
+	};
+
+	const mobileTitle = $derived(() => {
+		const path = $page.url.pathname.replace(base, '') || '/';
+		return pageTitles[path] ?? '';
+	});
 
 	onMount(() => {
 		theme.init();
@@ -64,8 +81,21 @@
 	{@render children()}
 {:else if auth.isLoggedIn}
 	<Nav />
+	<TitleBarSearch />
 	<!-- Main content area: offset for sidebar on desktop, bottom nav + player on mobile -->
-	<main class="min-h-screen pb-36 lg:pl-56 lg:pb-20" style="padding-top: env(safe-area-inset-top, 0px);">
+	<main class="min-h-screen pb-36 lg:pl-56 lg:pb-20" style="padding-top: max(env(safe-area-inset-top, 0px), env(titlebar-area-height, 0px));">
+		{#if mobileTitle()}
+			<div class="flex items-center justify-between px-4 pb-2 pt-3 sm:px-6 lg:hidden">
+				<h1 class="text-2xl font-bold text-text">{mobileTitle()}</h1>
+				<a
+					href="{base}/settings"
+					class="flex h-9 w-9 items-center justify-center rounded-full bg-accent/15 text-accent transition-colors hover:bg-accent/25"
+					aria-label="Settings"
+				>
+					<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+				</a>
+			</div>
+		{/if}
 		{@render children()}
 	</main>
 	<PlayerBar />

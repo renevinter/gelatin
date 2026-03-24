@@ -43,7 +43,7 @@
 </svelte:head>
 
 <div class="space-y-8 p-4 pb-24 sm:p-6">
-	<h1 class="text-2xl font-bold text-text">Home</h1>
+	<h1 class="hidden text-2xl font-bold text-text lg:block">Home</h1>
 
 	<!-- Latest Albums -->
 	<section>

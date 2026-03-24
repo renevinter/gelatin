@@ -2,6 +2,8 @@
 	import { search, type SearchResults } from '$lib/api/search';
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
+	import { page } from '$app/stores';
+	import { onMount } from 'svelte';
 	import AlbumCard from '$lib/components/AlbumCard.svelte';
 	import ArtistCard from '$lib/components/ArtistCard.svelte';
 	import TrackList from '$lib/components/TrackList.svelte';
@@ -13,22 +15,32 @@
 
 	let searchTimeout: ReturnType<typeof setTimeout>;
 
+	onMount(() => {
+		const q = $page.url.searchParams.get('q');
+		if (q) {
+			query = q;
+			doSearch(q);
+		}
+	});
+
+	async function doSearch(q: string) {
+		loading = true;
+		try {
+			results = await search(q);
+		} catch (err) {
+			console.error('Search failed:', err);
+		} finally {
+			loading = false;
+		}
+	}
+
 	function handleInput() {
 		clearTimeout(searchTimeout);
 		if (!query.trim()) {
 			results = null;
 			return;
 		}
-		searchTimeout = setTimeout(async () => {
-			loading = true;
-			try {
-				results = await search(query);
-			} catch (err) {
-				console.error('Search failed:', err);
-			} finally {
-				loading = false;
-			}
-		}, 300);
+		searchTimeout = setTimeout(() => doSearch(query), 300);
 	}
 
 	const hasResults = $derived(

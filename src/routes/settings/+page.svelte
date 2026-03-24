@@ -38,7 +38,7 @@
 </svelte:head>
 
 <div class="mx-auto max-w-xl p-4 pb-24 sm:p-6">
-	<h1 class="mb-6 text-2xl font-bold text-text">Settings</h1>
+	<h1 class="mb-6 hidden text-2xl font-bold text-text lg:block">Settings</h1>
 
 	<!-- Server Info -->
 	{#if auth.current}

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { base } from '$app/paths';
+	import { auth } from '$lib/stores/auth.svelte';
 
 	const navItems = [
 		{ path: '/', label: 'Home', icon: 'home' },
@@ -9,15 +10,14 @@
 		{ path: '/albums', label: 'Albums', icon: 'albums' },
 		{ path: '/songs', label: 'Songs', icon: 'songs' },
 		{ path: '/playlists', label: 'Playlists', icon: 'playlists' },
-		{ path: '/favorites', label: 'Favorites', icon: 'favorites' },
-		{ path: '/settings', label: 'Settings', icon: 'settings' }
+		{ path: '/favorites', label: 'Favorites', icon: 'favorites' }
 	];
 
 	const links = $derived(navItems.map((item) => ({ ...item, href: `${base}${item.path}` })));
 
 	const mobileLinks = $derived(
 		links.filter((l) =>
-			['/', '/search', '/albums', '/favorites', '/settings'].includes(l.path)
+			['/', '/search', '/albums', '/favorites'].includes(l.path)
 		)
 	);
 
@@ -25,10 +25,22 @@
 		if (href === `${base}/`) return pathname === `${base}/` || pathname === base;
 		return pathname.startsWith(href);
 	}
+
+	function getDisplayDomain(url: string): string {
+		try {
+			const hostname = new URL(url).hostname;
+			const parts = hostname.split('.');
+			return parts.length > 2 ? parts.slice(-2).join('.') : hostname;
+		} catch {
+			return url;
+		}
+	}
+
+	const settingsActive = $derived($page.url.pathname.startsWith(`${base}/settings`));
 </script>
 
 <!-- Desktop sidebar -->
-<nav class="fixed left-0 top-0 z-30 hidden h-full w-56 flex-col border-r border-border bg-bg lg:flex">
+<nav class="fixed left-0 top-0 z-30 hidden h-full w-56 flex-col border-r border-border bg-bg lg:flex" style="padding-top: env(titlebar-area-height, 0px);">
 	<div class="flex items-center gap-2 px-5 py-5">
 		<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-accent">
 			<svg class="h-4 w-4 text-accent-text" viewBox="0 0 64 64" fill="currentColor">
@@ -59,13 +71,26 @@
 					<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18c-.31-.11-.65-.18-1-.18-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z"/></svg>
 				{:else if link.icon === 'favorites'}
 					<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-				{:else if link.icon === 'settings'}
-					<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
 				{/if}
 				{link.label}
 			</a>
 		{/each}
 	</div>
+
+	{#if auth.current}
+		<a
+			href="{base}/settings"
+			class="flex items-center gap-3 border-t border-border px-4 py-3 transition-colors {settingsActive ? 'bg-surface' : 'hover:bg-surface-hover'}"
+		>
+			<div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-accent/15 text-accent">
+				<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+			</div>
+			<div class="min-w-0">
+				<p class="truncate text-sm font-medium text-text">{auth.current.username}</p>
+				<p class="truncate text-xs text-text-muted">{getDisplayDomain(auth.current.serverUrl)}</p>
+			</div>
+		</a>
+	{/if}
 </nav>
 
 <!-- Mobile bottom nav -->
@@ -84,8 +109,6 @@
 				<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5c-2.49 0-4.5-2.01-4.5-4.5S9.51 7.5 12 7.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5zm0-5.5c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"/></svg>
 			{:else if link.icon === 'favorites'}
 				<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-			{:else if link.icon === 'settings'}
-				<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
 			{/if}
 			<span>{link.label}</span>
 		</a>

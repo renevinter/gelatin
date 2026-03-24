@@ -42,7 +42,7 @@
 
 <div class="p-4 pb-24 sm:p-6">
 	<div class="mb-6 flex items-center justify-between">
-		<h1 class="text-2xl font-bold text-text">Songs</h1>
+		<h1 class="hidden text-2xl font-bold text-text lg:block">Songs</h1>
 		<div class="flex items-center gap-3">
 			<span class="text-sm text-text-muted">{totalCount} songs</span>
 			<select

@@ -46,7 +46,7 @@
 
 <div class="p-4 pb-24 sm:p-6">
 	<div class="mb-6 flex items-center justify-between">
-		<h1 class="text-2xl font-bold text-text">Playlists</h1>
+		<h1 class="hidden text-2xl font-bold text-text lg:block">Playlists</h1>
 		<button
 			onclick={() => (showCreate = !showCreate)}
 			class="flex items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-sm font-medium text-accent-text transition-colors hover:bg-accent-hover"
