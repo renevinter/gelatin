@@ -18,10 +18,36 @@
 		player.seek(ratio * player.duration);
 	}
 
+	let lastTrackId = $state('');
+
+	$effect(() => {
+		const id = player.currentTrack?.id;
+		if (id && id !== lastTrackId) {
+			lastTrackId = id;
+			firstLyricTime = -1;
+			lastLyricTime = -1;
+		}
+	});
+
 	function close() {
 		player.showNowPlaying = false;
 		player.showLyrics = false;
 	}
+
+	let firstLyricTime = $state(-1);
+	let lastLyricTime = $state(-1);
+
+	function handleTiming(first: number, last: number) {
+		firstLyricTime = first;
+		lastLyricTime = last;
+	}
+
+	const lyricsActive = $derived(
+		player.showLyrics &&
+		firstLyricTime >= 0 &&
+		player.currentTime >= firstLyricTime - 1.5 &&
+		player.currentTime <= lastLyricTime + 3
+	);
 
 	async function handleFavorite() {
 		const track = player.currentTrack;
@@ -81,11 +107,13 @@
 			</div>
 		</div>
 
-		<!-- Content: split view on desktop, stacked on mobile -->
-		<div class="flex flex-1 flex-col overflow-hidden lg:flex-row lg:items-stretch lg:gap-8 lg:px-12">
-			<!-- Album art: always visible on desktop, toggle with lyrics on mobile -->
-			<div class="flex flex-1 flex-col items-center justify-center px-8 {player.showLyrics ? 'hidden lg:flex' : 'flex'}">
-				<div class="w-full max-w-[14rem] lg:max-w-sm">
+		<!-- Content: overlapping on mobile, split view on desktop -->
+		<div class="relative flex-1 overflow-hidden lg:flex lg:flex-row lg:items-stretch lg:px-12 lg:transition-all lg:duration-700 {lyricsActive ? 'lg:gap-4' : 'lg:gap-0'}">
+			<!-- Album art -->
+			<div
+				class="absolute inset-0 flex items-center justify-center px-8 transition-opacity duration-700 ease-in-out lg:static lg:flex-1 lg:opacity-100 {lyricsActive ? 'opacity-0 pointer-events-none lg:opacity-100 lg:pointer-events-auto' : 'opacity-100'}"
+			>
+				<div class="w-full max-w-[20rem] transition-all duration-700 lg:max-w-sm {lyricsActive ? '' : 'lg:max-w-md'}">
 					<div class="aspect-square w-full overflow-hidden rounded-xl shadow-2xl">
 						<img
 							src={artUrl}
@@ -96,12 +124,17 @@
 				</div>
 			</div>
 
-			<!-- Lyrics panel: visible when toggled -->
-			{#if player.showLyrics}
-				<div class="flex flex-1 flex-col overflow-hidden px-4 lg:px-0">
-					<Lyrics trackId={track.id} currentTime={player.currentTime} onseek={(t) => player.seek(t)} />
-				</div>
-			{/if}
+			<!-- Lyrics panel -->
+			<div
+				class="absolute inset-0 flex flex-col overflow-hidden px-4 transition-all duration-700 ease-in-out lg:static lg:px-0 {lyricsActive ? 'opacity-100 lg:flex-1' : 'opacity-0 pointer-events-none lg:flex-none lg:basis-0'}"
+			>
+				<Lyrics
+					trackId={track.id}
+					currentTime={player.currentTime}
+					onseek={(t) => player.seek(t)}
+					ontiming={handleTiming}
+				/>
+			</div>
 		</div>
 
 		<!-- Track info + controls -->

@@ -1,14 +1,15 @@
 <script lang="ts">
 	import { getLyrics, type LyricLine } from '$lib/api/lyrics';
-	import { onMount, tick } from 'svelte';
+	import { onMount, tick, untrack } from 'svelte';
 
 	interface Props {
 		trackId: string;
 		currentTime: number;
 		onseek?: (time: number) => void;
+		ontiming?: (firstStart: number, lastStart: number) => void;
 	}
 
-	let { trackId, currentTime, onseek }: Props = $props();
+	let { trackId, currentTime, onseek, ontiming }: Props = $props();
 
 	let lines = $state<LyricLine[]>([]);
 	let loading = $state(true);
@@ -17,6 +18,7 @@
 	let inner: HTMLDivElement | undefined = $state();
 	let lastTrackId = $state('');
 	let halfHeight = $state(0);
+	let needsInstantScroll = $state(true);
 
 	onMount(() => {
 		if (outer) {
@@ -33,6 +35,9 @@
 				lines = data?.lines ?? [];
 				loading = false;
 				error = false;
+				if (ontiming && lines.length > 0) {
+					ontiming(lines[0].start, lines[lines.length - 1].start);
+				}
 				await tick();
 				if (outer && halfHeight === 0) {
 					halfHeight = outer.clientHeight / 2;
@@ -61,7 +66,14 @@
 			const el = children[activeLine] as HTMLElement | undefined;
 			if (el) {
 				const scrollTarget = el.offsetTop - outer.clientHeight / 2 + el.clientHeight / 2;
-				outer.scrollTo({ top: scrollTarget, behavior: 'smooth' });
+				const behavior = untrack(() => {
+					if (needsInstantScroll) {
+						needsInstantScroll = false;
+						return 'instant' as const;
+					}
+					return 'smooth' as const;
+				});
+				outer.scrollTo({ top: scrollTarget, behavior });
 			}
 		}
 	});
@@ -96,7 +108,7 @@
 				<p
 					role={onseek ? 'button' : undefined}
 					tabindex={onseek ? 0 : undefined}
-					class="px-4 py-2 text-center text-xl lg:py-3 lg:text-3xl {i === activeLine ? 'font-bold text-white scale-105' : 'text-white/50'} {onseek ? 'cursor-pointer hover:text-white/70' : ''}"
+					class="px-4 py-2 text-center text-2xl lg:py-3 lg:text-3xl {i === activeLine ? 'font-bold text-white scale-105' : 'text-white/50'} {onseek ? 'cursor-pointer hover:text-white/70' : ''}"
 					style="transition: font-weight 0.5s, transform 0.5s, color 0.5s;"
 					onclick={() => handleLineClick(line)}
 				>
