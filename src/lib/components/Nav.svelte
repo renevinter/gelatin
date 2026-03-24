@@ -1,23 +1,28 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import { base } from '$app/paths';
 
-	const links = [
-		{ href: '/', label: 'Home', icon: 'home' },
-		{ href: '/search', label: 'Search', icon: 'search' },
-		{ href: '/artists', label: 'Artists', icon: 'artists' },
-		{ href: '/albums', label: 'Albums', icon: 'albums' },
-		{ href: '/songs', label: 'Songs', icon: 'songs' },
-		{ href: '/playlists', label: 'Playlists', icon: 'playlists' },
-		{ href: '/favorites', label: 'Favorites', icon: 'favorites' },
-		{ href: '/settings', label: 'Settings', icon: 'settings' }
+	const navItems = [
+		{ path: '/', label: 'Home', icon: 'home' },
+		{ path: '/search', label: 'Search', icon: 'search' },
+		{ path: '/artists', label: 'Artists', icon: 'artists' },
+		{ path: '/albums', label: 'Albums', icon: 'albums' },
+		{ path: '/songs', label: 'Songs', icon: 'songs' },
+		{ path: '/playlists', label: 'Playlists', icon: 'playlists' },
+		{ path: '/favorites', label: 'Favorites', icon: 'favorites' },
+		{ path: '/settings', label: 'Settings', icon: 'settings' }
 	];
 
-	const mobileLinks = links.filter((l) =>
-		['/', '/search', '/albums', '/favorites', '/settings'].includes(l.href)
+	const links = $derived(navItems.map((item) => ({ ...item, href: `${base}${item.path}` })));
+
+	const mobileLinks = $derived(
+		links.filter((l) =>
+			['/', '/search', '/albums', '/favorites', '/settings'].includes(l.path)
+		)
 	);
 
 	function isActive(href: string, pathname: string): boolean {
-		if (href === '/') return pathname === '/';
+		if (href === `${base}/`) return pathname === `${base}/` || pathname === base;
 		return pathname.startsWith(href);
 	}
 </script>
@@ -64,7 +69,7 @@
 </nav>
 
 <!-- Mobile bottom nav -->
-<nav class="fixed bottom-0 left-0 right-0 z-30 flex border-t border-border bg-bg lg:hidden {$$restProps.class ?? ''}">
+<nav class="fixed bottom-0 left-0 right-0 z-30 flex border-t border-border bg-bg lg:hidden">
 	{#each mobileLinks as link}
 		{@const active = isActive(link.href, $page.url.pathname)}
 		<a

@@ -3,6 +3,7 @@
 	import type { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models';
 	import { getAlbumArtists } from '$lib/api/library';
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import ArtistCard from '$lib/components/ArtistCard.svelte';
 	import Skeleton from '$lib/components/Skeleton.svelte';
 
@@ -68,7 +69,7 @@
 	{:else}
 		<div class="grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8">
 			{#each artists as artist}
-				<ArtistCard {artist} onclick={() => goto(`/artists/${artist.Id}`)} />
+				<ArtistCard {artist} onclick={() => goto(`${base}/artists/${artist.Id}`)} />
 			{/each}
 		</div>
 

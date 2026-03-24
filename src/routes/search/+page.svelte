@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { search, type SearchResults } from '$lib/api/search';
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import AlbumCard from '$lib/components/AlbumCard.svelte';
 	import ArtistCard from '$lib/components/ArtistCard.svelte';
 	import TrackList from '$lib/components/TrackList.svelte';
@@ -82,7 +83,7 @@
 					<h2 class="mb-4 text-lg font-semibold text-text">Artists</h2>
 					<div class="grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
 						{#each results.artists.slice(0, tab === 'all' ? 6 : undefined) as artist}
-							<ArtistCard {artist} onclick={() => goto(`/artists/${artist.Id}`)} />
+							<ArtistCard {artist} onclick={() => goto(`${base}/artists/${artist.Id}`)} />
 						{/each}
 					</div>
 				</section>
@@ -94,7 +95,7 @@
 					<h2 class="mb-4 text-lg font-semibold text-text">Albums</h2>
 					<div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
 						{#each results.albums.slice(0, tab === 'all' ? 6 : undefined) as album}
-							<AlbumCard {album} onclick={() => goto(`/albums/${album.Id}`)} />
+							<AlbumCard {album} onclick={() => goto(`${base}/albums/${album.Id}`)} />
 						{/each}
 					</div>
 				</section>

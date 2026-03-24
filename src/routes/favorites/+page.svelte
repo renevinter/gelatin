@@ -3,6 +3,7 @@
 	import type { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models';
 	import { getFavorites } from '$lib/api/favorites';
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import AlbumCard from '$lib/components/AlbumCard.svelte';
 	import ArtistCard from '$lib/components/ArtistCard.svelte';
 	import TrackList from '$lib/components/TrackList.svelte';
@@ -81,7 +82,7 @@
 		{#if albums.length > 0}
 			<div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
 				{#each albums as album}
-					<AlbumCard {album} onclick={() => goto(`/albums/${album.Id}`)} />
+					<AlbumCard {album} onclick={() => goto(`${base}/albums/${album.Id}`)} />
 				{/each}
 			</div>
 		{:else}
@@ -91,7 +92,7 @@
 		{#if artists.length > 0}
 			<div class="grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
 				{#each artists as artist}
-					<ArtistCard {artist} onclick={() => goto(`/artists/${artist.Id}`)} />
+					<ArtistCard {artist} onclick={() => goto(`${base}/artists/${artist.Id}`)} />
 				{/each}
 			</div>
 		{:else}

@@ -2,6 +2,7 @@
 	import '../app.css';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { auth } from '$lib/stores/auth.svelte';
 	import { theme } from '$lib/stores/theme.svelte';
@@ -14,7 +15,7 @@
 
 	let { children } = $props();
 
-	const isLoginPage = $derived($page.url.pathname === '/login');
+	const isLoginPage = $derived($page.url.pathname === `${base}/login`);
 
 	onMount(() => {
 		theme.init();
@@ -22,7 +23,7 @@
 
 	$effect(() => {
 		if (!auth.isLoggedIn && !isLoginPage) {
-			goto('/login');
+			goto(`${base}/login`);
 		}
 	});
 

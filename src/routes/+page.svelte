@@ -5,6 +5,7 @@
 	import { getPlaylists } from '$lib/api/playlists';
 	import { player, itemToTrack } from '$lib/stores/player.svelte';
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import { getImageUrl } from '$lib/api/images';
 	import AlbumCard from '$lib/components/AlbumCard.svelte';
 	import Skeleton from '$lib/components/Skeleton.svelte';
@@ -61,7 +62,7 @@
 			<div class="-mx-4 flex gap-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 scrollbar-hide">
 				{#each latestAlbums as album}
 					<div class="w-36 flex-shrink-0 sm:w-40">
-						<AlbumCard {album} onclick={() => goto(`/albums/${album.Id}`)} />
+						<AlbumCard {album} onclick={() => goto(`${base}/albums/${album.Id}`)} />
 					</div>
 				{/each}
 			</div>
@@ -108,12 +109,12 @@
 		<section>
 			<div class="mb-4 flex items-center justify-between">
 				<h2 class="text-lg font-semibold text-text">Your Playlists</h2>
-				<a href="/playlists" class="text-sm text-accent hover:underline">See all</a>
+				<a href="{base}/playlists" class="text-sm text-accent hover:underline">See all</a>
 			</div>
 			<div class="-mx-4 flex gap-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 scrollbar-hide">
 				{#each playlists as playlist}
 					<div class="w-36 flex-shrink-0 sm:w-40">
-						<AlbumCard album={playlist} onclick={() => goto(`/playlists/${playlist.Id}`)} />
+						<AlbumCard album={playlist} onclick={() => goto(`${base}/playlists/${playlist.Id}`)} />
 					</div>
 				{/each}
 			</div>

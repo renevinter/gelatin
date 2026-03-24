@@ -3,6 +3,7 @@
 	import type { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models';
 	import { getPlaylists, createPlaylist } from '$lib/api/playlists';
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import AlbumCard from '$lib/components/AlbumCard.svelte';
 	import Skeleton from '$lib/components/Skeleton.svelte';
 
@@ -87,7 +88,7 @@
 	{:else if playlists.length > 0}
 		<div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
 			{#each playlists as playlist}
-				<AlbumCard album={playlist} onclick={() => goto(`/playlists/${playlist.Id}`)} />
+				<AlbumCard album={playlist} onclick={() => goto(`${base}/playlists/${playlist.Id}`)} />
 			{/each}
 		</div>
 	{:else}

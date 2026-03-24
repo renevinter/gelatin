@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import { auth } from '$lib/stores/auth.svelte';
 	import { theme } from '$lib/stores/theme.svelte';
 	import { logout } from '$lib/api/auth';
@@ -14,7 +15,7 @@
 	function handleLogout() {
 		player.clearQueue();
 		logout();
-		goto('/login');
+		goto(`${base}/login`);
 	}
 
 	function handleClearCache() {

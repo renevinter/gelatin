@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import { login } from '$lib/api/auth';
 
 	let serverUrl = $state('');
@@ -14,7 +15,7 @@
 		loading = true;
 		try {
 			await login(serverUrl, username, password);
-			goto('/');
+			goto(`${base}/`);
 		} catch (err: any) {
 			error = err?.response?.data?.message ?? err?.message ?? 'Failed to connect';
 		} finally {
