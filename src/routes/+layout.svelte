@@ -65,7 +65,7 @@
 {:else if auth.isLoggedIn}
 	<Nav />
 	<!-- Main content area: offset for sidebar on desktop, bottom nav + player on mobile -->
-	<main class="min-h-screen pb-36 lg:pl-56 lg:pb-20">
+	<main class="min-h-screen pb-36 lg:pl-56 lg:pb-20" style="padding-top: env(safe-area-inset-top, 0px);">
 		{@render children()}
 	</main>
 	<PlayerBar />
