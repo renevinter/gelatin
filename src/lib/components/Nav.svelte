@@ -40,7 +40,7 @@
 </script>
 
 <!-- Desktop sidebar -->
-<nav class="fixed left-0 top-0 z-30 hidden h-full w-56 flex-col border-r border-border bg-bg lg:flex" style="padding-top: env(titlebar-area-height, 0px);">
+<nav class="fixed left-0 top-0 z-30 hidden h-full w-56 flex-col border-r border-border/50 bg-bg/80 backdrop-blur-2xl lg:flex" style="padding-top: env(titlebar-area-height, 0px);">
 	<div class="flex items-center gap-2 px-5 py-5">
 		<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-accent">
 			<svg class="h-4 w-4 text-accent-text" viewBox="0 0 64 64" fill="currentColor">
@@ -80,7 +80,7 @@
 	{#if auth.current}
 		<a
 			href="{base}/settings"
-			class="flex items-center gap-3 border-t border-border px-4 py-3 transition-colors {settingsActive ? 'bg-surface' : 'hover:bg-surface-hover'}"
+			class="flex items-center gap-3 border-t border-border/50 px-4 py-3 transition-colors {settingsActive ? 'bg-surface/50' : 'hover:bg-surface-hover/50'}"
 		>
 			<div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-accent/15 text-accent">
 				<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
@@ -94,7 +94,7 @@
 </nav>
 
 <!-- Mobile bottom nav -->
-<nav class="fixed bottom-0 left-0 right-0 z-30 flex border-t border-border bg-bg lg:hidden" style="padding-bottom: env(safe-area-inset-bottom);">
+<nav class="fixed bottom-0 left-0 right-0 z-30 flex border-t border-border/50 bg-bg/80 backdrop-blur-2xl lg:hidden" style="padding-bottom: env(safe-area-inset-bottom);">
 	{#each mobileLinks as link}
 		{@const active = isActive(link.href, $page.url.pathname)}
 		<a

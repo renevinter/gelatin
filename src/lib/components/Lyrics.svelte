@@ -108,7 +108,7 @@
 				<p
 					role={onseek ? 'button' : undefined}
 					tabindex={onseek ? 0 : undefined}
-					class="px-4 py-2 text-center text-2xl lg:py-3 lg:text-3xl {i === activeLine ? 'font-bold text-white scale-105' : 'text-white/50'} {onseek ? 'cursor-pointer hover:text-white/70' : ''}"
+					class="px-4 py-2 text-center text-2xl landscape:text-3xl lg:py-3 lg:text-3xl {i === activeLine ? 'font-bold text-white scale-105' : 'text-white/50'} {onseek ? 'cursor-pointer hover:text-white/70' : ''}"
 					style="transition: font-weight 0.5s, transform 0.5s, color 0.5s;"
 					onclick={() => handleLineClick(line)}
 				>
