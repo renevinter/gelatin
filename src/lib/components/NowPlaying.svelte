@@ -42,7 +42,7 @@
 
 {#if player.showNowPlaying && player.currentTrack}
 	{@const track = player.currentTrack}
-	<div class="fixed inset-0 z-50 flex flex-col bg-bg">
+	<div class="fixed inset-0 z-50 flex flex-col bg-bg" style="padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);">
 		<!-- Header -->
 		<div class="flex items-center justify-between px-4 py-3">
 			<button onclick={close} class="p-2 text-text-muted hover:text-text" aria-label="Close">

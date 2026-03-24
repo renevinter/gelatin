@@ -7,7 +7,7 @@
 	<title>Gelatin</title>
 </svelte:head>
 
-<div class="welcome-bg fixed inset-0 flex flex-col items-center justify-between px-6 py-12">
+<div class="welcome-bg fixed inset-0 flex flex-col items-center justify-between px-6 py-12" style="padding-top: max(3rem, env(safe-area-inset-top, 3rem)); padding-bottom: max(3rem, env(safe-area-inset-bottom, 3rem));">
 	<div></div>
 
 	<div class="flex flex-col items-center">

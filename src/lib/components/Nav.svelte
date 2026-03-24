@@ -69,7 +69,7 @@
 </nav>
 
 <!-- Mobile bottom nav -->
-<nav class="fixed bottom-0 left-0 right-0 z-30 flex border-t border-border bg-bg lg:hidden">
+<nav class="fixed bottom-0 left-0 right-0 z-30 flex border-t border-border bg-bg lg:hidden" style="padding-bottom: env(safe-area-inset-bottom);">
 	{#each mobileLinks as link}
 		{@const active = isActive(link.href, $page.url.pathname)}
 		<a

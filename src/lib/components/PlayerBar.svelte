@@ -22,7 +22,7 @@
 </script>
 
 {#if player.currentTrack}
-	<div class="fixed bottom-[3.25rem] left-0 right-0 z-40 border-t border-border bg-player-bg lg:bottom-0 lg:left-56">
+	<div class="safe-bottom-player fixed left-0 right-0 z-40 border-t border-border bg-player-bg lg:left-56">
 		<!-- Progress bar (clickable thin bar at top of player) -->
 		<button
 			class="group relative block h-1 w-full cursor-pointer bg-border"

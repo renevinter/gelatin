@@ -28,7 +28,7 @@
 	<title>Gelatin - Login</title>
 </svelte:head>
 
-<div class="flex min-h-screen items-center justify-center bg-bg px-4">
+<div class="flex min-h-screen items-center justify-center bg-bg px-4" style="padding-bottom: env(safe-area-inset-bottom, 0px);">
 	<div class="w-full max-w-sm">
 		<div class="mb-8 text-center">
 			<div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-accent">
