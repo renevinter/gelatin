@@ -80,7 +80,7 @@
 {#if isPublicPage}
 	{@render children()}
 {:else if auth.isLoggedIn}
-	<div class="relative flex h-[100dvh] flex-col overflow-hidden">
+	<div class="fixed inset-0 flex flex-col overflow-hidden">
 		<TitleBarSearch />
 
 		<div class="flex flex-1 overflow-hidden">
