@@ -2,7 +2,7 @@
 	import { player } from '$lib/stores/player.svelte';
 	import { getImageUrl } from '$lib/api/images';
 	import { toggleFavorite } from '$lib/api/favorites';
-	import { onMount, untrack } from 'svelte';
+	import { onMount } from 'svelte';
 	import Lyrics from './Lyrics.svelte';
 
 	let dragY = $state(0);
@@ -116,15 +116,6 @@
 		}
 	}
 
-	$effect(() => {
-		if (player.showNowPlaying) {
-			document.body.style.overflow = 'hidden';
-			return () => {
-				document.body.style.overflow = '';
-			};
-		}
-	});
-
 	// Screen Wake Lock: keep screen on in StandBy mode
 	let wakeLock: WakeLockSentinel | null = null;
 
@@ -170,8 +161,8 @@
 	{@const trackMeta = { artistName: track.artistName, name: track.name, albumName: track.albumName, duration: track.duration }}
 
 	<div
-		class="fixed inset-0 z-50 flex flex-col overflow-hidden text-white {isDragging ? '' : 'transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]'} {player.showNowPlaying ? '' : 'translate-y-full pointer-events-none'}"
-		style="padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); {player.showNowPlaying && dragY > 0 ? `transform: translateY(${dragY}px);` : ''}"
+		class="absolute inset-0 z-40 flex flex-col overflow-hidden text-white {isDragging ? '' : 'transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]'} {player.showNowPlaying ? '' : 'translate-y-full pointer-events-none'}"
+		style="{player.showNowPlaying && dragY > 0 ? `transform: translateY(${dragY}px);` : ''}"
 	>
 		{#if isStandby}
 			<!-- StandBy mode: AMOLED black, art left, lyrics right -->

@@ -11,7 +11,7 @@
 </script>
 
 {#if player.showQueue}
-	<div class="safe-bottom-queue fixed right-0 z-40 flex h-[50vh] w-full flex-col border-l border-t border-border/50 bg-bg/80 backdrop-blur-2xl lg:left-auto lg:w-96">
+	<div class="absolute bottom-0 right-0 z-20 flex h-[50%] w-full flex-col border-l border-t border-border/50 bg-bg/80 backdrop-blur-2xl lg:w-96">
 		<div class="flex items-center justify-between border-b border-border/50 px-4 py-3">
 			<h2 class="text-sm font-semibold text-text">Queue</h2>
 			<div class="flex items-center gap-2">
