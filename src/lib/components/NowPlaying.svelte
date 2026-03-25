@@ -161,7 +161,7 @@
 	{@const trackMeta = { artistName: track.artistName, name: track.name, albumName: track.albumName, duration: track.duration }}
 
 	<div
-		class="absolute inset-0 z-40 flex flex-col overflow-hidden text-white {isDragging ? '' : 'transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]'} {player.showNowPlaying ? '' : 'translate-y-full pointer-events-none'}"
+		class="fixed inset-0 z-40 flex flex-col overflow-hidden text-white {isDragging ? '' : 'transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]'} {player.showNowPlaying ? '' : 'translate-y-full pointer-events-none'}"
 		style="{player.showNowPlaying && dragY > 0 ? `transform: translateY(${dragY}px);` : ''}"
 	>
 		{#if isStandby}
