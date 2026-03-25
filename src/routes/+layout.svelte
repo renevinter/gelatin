@@ -80,7 +80,7 @@
 {#if isPublicPage}
 	{@render children()}
 {:else if auth.isLoggedIn}
-	<div class="fixed inset-0 flex flex-col overflow-hidden">
+	<div class="fixed inset-0 flex flex-col overflow-hidden bg-bg">
 		<TitleBarSearch />
 
 		<div class="flex flex-1 overflow-hidden">
@@ -125,7 +125,7 @@
 		</div>
 
 		<!-- Mobile bottom: player bar + floating nav pill -->
-		<div class="pointer-events-none absolute inset-x-0 bottom-0 z-30 lg:hidden" style="padding-bottom: env(safe-area-inset-bottom, 0px);">
+		<div class="pointer-events-none absolute inset-x-0 bottom-0 z-30 pb-2 lg:hidden">
 			<div class="pointer-events-auto px-4 pb-1">
 				<PlayerBar mobile />
 			</div>
