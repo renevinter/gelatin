@@ -2,8 +2,16 @@ import type { Track, RepeatMode } from '$lib/types';
 import type { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models';
 import { getStreamUrl } from '$lib/api/stream';
 import { getImageUrl } from '$lib/api/images';
+import { settings } from '$lib/stores/settings.svelte';
 
 let audio: HTMLAudioElement | null = null;
+let audioContext: AudioContext | null = null;
+let gainNode: GainNode | null = null;
+let sourceNode: MediaElementAudioSourceNode | null = null;
+
+function dBToLinear(db: number): number {
+	return Math.pow(10, db / 20);
+}
 
 function getAudio(): HTMLAudioElement {
 	if (!audio && typeof window !== 'undefined') {
@@ -28,6 +36,61 @@ function getAudio(): HTMLAudioElement {
 		});
 	}
 	return audio!;
+}
+
+function ensureAudioPipeline() {
+	if (audioContext || !audio) return;
+	try {
+		audio.crossOrigin = 'anonymous';
+		const ctx = new AudioContext();
+		const src = ctx.createMediaElementSource(audio);
+		const gain = ctx.createGain();
+		src.connect(gain);
+		gain.connect(ctx.destination);
+		audioContext = ctx;
+		sourceNode = src;
+		gainNode = gain;
+		if (ctx.state === 'suspended') ctx.resume();
+	} catch {
+		audioContext = null;
+		sourceNode = null;
+		gainNode = null;
+	}
+}
+
+function teardownAudioPipeline() {
+	if (sourceNode) {
+		try { sourceNode.disconnect(); } catch { /* already disconnected */ }
+	}
+	if (gainNode) {
+		try { gainNode.disconnect(); } catch { /* already disconnected */ }
+	}
+	if (audioContext) {
+		audioContext.close();
+	}
+	audioContext = null;
+	sourceNode = null;
+	gainNode = null;
+	if (audio) audio.crossOrigin = null;
+}
+
+function resumeAudioContext() {
+	if (audioContext?.state === 'suspended') {
+		audioContext.resume();
+	}
+}
+
+function applyNormalizationGain(track: Track) {
+	const needsPipeline = settings.volumeNormalization && track.normalizationGain != null;
+
+	if (needsPipeline) {
+		ensureAudioPipeline();
+		if (gainNode) {
+			gainNode.gain.value = dBToLinear(track.normalizationGain!);
+		}
+	} else {
+		if (audioContext) teardownAudioPipeline();
+	}
 }
 
 let queue = $state<Track[]>([]);
@@ -60,6 +123,7 @@ function handleTrackEnd() {
 
 function loadTrack(track: Track) {
 	const a = getAudio();
+	applyNormalizationGain(track);
 	a.src = getStreamUrl(track.id);
 	a.volume = volume;
 	currentTime = 0;
@@ -89,6 +153,12 @@ function updateMediaSession(track: Track) {
 }
 
 export function itemToTrack(item: BaseItemDto): Track {
+	let normGain: number | undefined;
+	const gain = (item as any).NormalizationGain;
+	if (typeof gain === 'number') {
+		normGain = gain;
+	}
+
 	return {
 		id: item.Id!,
 		name: item.Name ?? 'Unknown',
@@ -97,8 +167,9 @@ export function itemToTrack(item: BaseItemDto): Track {
 		albumId: item.AlbumId ?? item.ParentId ?? item.Id!,
 		imageItemId: item.Id!,
 		duration: (item.RunTimeTicks ?? 0) / 10_000_000,
-		index: item.IndexNumber,
-		isFavorite: item.UserData?.IsFavorite ?? false
+		index: item.IndexNumber ?? undefined,
+		isFavorite: item.UserData?.IsFavorite ?? false,
+		normalizationGain: normGain
 	};
 }
 
@@ -151,6 +222,7 @@ export const player = {
 	},
 
 	play() {
+		resumeAudioContext();
 		getAudio().play();
 	},
 	pause() {
@@ -174,6 +246,7 @@ export const player = {
 		if (index < 0 || index >= queue.length) return;
 		queueIndex = index;
 		loadTrack(queue[index]);
+		resumeAudioContext();
 		getAudio().play();
 	},
 	next() {

@@ -5,11 +5,24 @@
 	import { theme } from '$lib/stores/theme.svelte';
 	import { logout } from '$lib/api/auth';
 	import { player } from '$lib/stores/player.svelte';
+	import { settings, type StreamQuality, type LyricsSource } from '$lib/stores/settings.svelte';
 
 	const themeOptions: { value: 'light' | 'dark' | 'system'; label: string }[] = [
 		{ value: 'system', label: 'System' },
 		{ value: 'light', label: 'Light' },
 		{ value: 'dark', label: 'Dark' }
+	];
+
+	const qualityOptions: { value: StreamQuality; label: string }[] = [
+		{ value: 'original', label: 'Original' },
+		{ value: '320', label: '320 kbps' },
+		{ value: '256', label: '256 kbps' },
+		{ value: '128', label: '128 kbps' }
+	];
+
+	const lyricsOptions: { value: LyricsSource; label: string }[] = [
+		{ value: 'jellyfin', label: 'Jellyfin Only' },
+		{ value: 'jellyfin+lrclib', label: 'Jellyfin + LRCLIB' }
 	];
 
 	function handleLogout() {
@@ -75,24 +88,88 @@
 		</div>
 	</section>
 
+	<!-- Streaming -->
+	<section class="mb-8 rounded-xl border border-border bg-surface p-4">
+		<h2 class="mb-3 text-sm font-semibold uppercase tracking-wider text-text-muted">Streaming</h2>
+		<div class="space-y-4">
+			<div class="flex items-center justify-between">
+				<span class="text-sm text-text">Wi-Fi Quality</span>
+				<select
+					class="rounded-lg border border-border bg-bg px-3 py-1.5 text-sm text-text"
+					value={settings.streamQualityWifi}
+					onchange={(e) => { settings.streamQualityWifi = (e.target as HTMLSelectElement).value as StreamQuality; }}
+				>
+					{#each qualityOptions as opt}
+						<option value={opt.value} selected={settings.streamQualityWifi === opt.value}>{opt.label}</option>
+					{/each}
+				</select>
+			</div>
+			<div class="flex items-center justify-between">
+				<span class="text-sm text-text">Cellular Quality</span>
+				<select
+					class="rounded-lg border border-border bg-bg px-3 py-1.5 text-sm text-text"
+					value={settings.streamQualityCellular}
+					onchange={(e) => { settings.streamQualityCellular = (e.target as HTMLSelectElement).value as StreamQuality; }}
+				>
+					{#each qualityOptions as opt}
+						<option value={opt.value} selected={settings.streamQualityCellular === opt.value}>{opt.label}</option>
+					{/each}
+				</select>
+			</div>
+		</div>
+	</section>
+
 	<!-- Playback -->
 	<section class="mb-8 rounded-xl border border-border bg-surface p-4">
 		<h2 class="mb-3 text-sm font-semibold uppercase tracking-wider text-text-muted">Playback</h2>
-		<div class="flex items-center justify-between">
-			<span class="text-sm text-text">Volume</span>
-			<div class="flex items-center gap-2">
-				<input
-					type="range"
-					min="0"
-					max="1"
-					step="0.05"
-					value={player.volume}
-					oninput={(e) => player.setVolume(Number((e.target as HTMLInputElement).value))}
-					class="w-32 accent-accent"
-				/>
-				<span class="w-8 text-right text-xs text-text-muted">{Math.round(player.volume * 100)}%</span>
+		<div class="space-y-4">
+			<div class="flex items-center justify-between">
+				<span class="text-sm text-text">Volume</span>
+				<div class="flex items-center gap-2">
+					<input
+						type="range"
+						min="0"
+						max="1"
+						step="0.05"
+						value={player.volume}
+						oninput={(e) => player.setVolume(Number((e.target as HTMLInputElement).value))}
+						class="w-32 accent-accent"
+					/>
+					<span class="w-8 text-right text-xs text-text-muted">{Math.round(player.volume * 100)}%</span>
+				</div>
+			</div>
+			<div class="flex items-center justify-between">
+				<span class="text-sm text-text">Volume Normalization</span>
+				<button
+					onclick={() => { settings.volumeNormalization = !settings.volumeNormalization; }}
+					class="relative h-6 w-11 rounded-full transition-colors {settings.volumeNormalization ? 'bg-accent' : 'bg-border'}"
+					role="switch"
+					aria-checked={settings.volumeNormalization}
+				>
+					<span
+						class="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform {settings.volumeNormalization ? 'translate-x-5' : 'translate-x-0'}"
+					></span>
+				</button>
 			</div>
 		</div>
+	</section>
+
+	<!-- Lyrics -->
+	<section class="mb-8 rounded-xl border border-border bg-surface p-4">
+		<h2 class="mb-3 text-sm font-semibold uppercase tracking-wider text-text-muted">Lyrics</h2>
+		<div class="flex items-center justify-between">
+			<span class="text-sm text-text">Lyrics Source</span>
+			<select
+				class="rounded-lg border border-border bg-bg px-3 py-1.5 text-sm text-text"
+				value={settings.lyricsSource}
+				onchange={(e) => { settings.lyricsSource = (e.target as HTMLSelectElement).value as LyricsSource; }}
+			>
+				{#each lyricsOptions as opt}
+					<option value={opt.value} selected={settings.lyricsSource === opt.value}>{opt.label}</option>
+				{/each}
+			</select>
+		</div>
+		<p class="mt-2 text-xs text-text-muted">LRCLIB provides community-sourced synced lyrics as a fallback when Jellyfin has none.</p>
 	</section>
 
 	<!-- Cache -->

@@ -1,17 +1,19 @@
 <script lang="ts">
-	import { getLyrics, type LyricLine } from '$lib/api/lyrics';
+	import { getLyrics, type LyricLine, type TrackMeta, type LyricsSource } from '$lib/api/lyrics';
 	import { onMount, tick, untrack } from 'svelte';
 
 	interface Props {
 		trackId: string;
 		currentTime: number;
+		trackMeta?: TrackMeta;
 		onseek?: (time: number) => void;
 		ontiming?: (firstStart: number, lastStart: number) => void;
 	}
 
-	let { trackId, currentTime, onseek, ontiming }: Props = $props();
+	let { trackId, currentTime, trackMeta, onseek, ontiming }: Props = $props();
 
 	let lines = $state<LyricLine[]>([]);
+	let source = $state<LyricsSource | null>(null);
 	let loading = $state(true);
 	let error = $state(false);
 	let outer: HTMLDivElement | undefined = $state();
@@ -31,8 +33,9 @@
 			lastTrackId = trackId;
 			loading = true;
 			error = false;
-			getLyrics(trackId).then(async (data) => {
+			getLyrics(trackId, trackMeta).then(async (data) => {
 				lines = data?.lines ?? [];
+				source = data?.source ?? null;
 				loading = false;
 				error = false;
 				if (ontiming && lines.length > 0) {
@@ -115,6 +118,9 @@
 					{line.text}
 				</p>
 			{/each}
+			{#if source === 'lrclib'}
+				<p class="mt-4 text-sm text-white/25">Lyrics sourced from LRCLIB</p>
+			{/if}
 		</div>
 	{/if}
 </div>

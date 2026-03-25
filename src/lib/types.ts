@@ -8,6 +8,7 @@ export interface Track {
 	duration: number;
 	index?: number;
 	isFavorite: boolean;
+	normalizationGain?: number;
 }
 
 export type RepeatMode = 'off' | 'all' | 'one';
